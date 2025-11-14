@@ -1,0 +1,22 @@
+[package]
+name = "milestone_fund_contract"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+doctest = false
+
+[dependencies]
+# This version should be kept in sync with the Soroban environment you are targeting.
+# Check the official Soroban docs for the latest version.
+soroban-sdk = "21.0.1"
+
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = "symbols"
