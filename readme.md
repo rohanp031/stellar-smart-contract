@@ -1,151 +1,168 @@
+<p align="center">
+  <img src="./logo.png" alt="MilstoneFund Logo" width="300"/>
+</p>
+
+# MilestoneFund – Decentralized Crowdfunding on Soroban
+
+MilestoneFund is a smart contract + frontend proof-of-concept demonstrating **decentralized, milestone-based crowdfunding** using **Soroban smart contracts** on the Stellar Network.
+
+The platform ensures that creators can raise funds transparently while backers retain control — **funds are only released when milestones are completed and approved through weighted voting.**
 
 ---
 
+## 🚀 Features
 
-***MilestoneFund - Decentralized Crowdfunding on Soroban**
-
-MilestoneFund is a smart contract and web application proof-of-concept that demonstrates decentralized, milestone-based crowdfunding on the Stellar network using the Soroban smart contract platform.
-
-This project allows creators to raise funds for a project and ensures that backers' funds are only released when the creator meets pre-defined, community-approved milestones.
-
----
-
-### **Tech Stack**
-
-**Smart Contract (Backend):** Rust with the Soroban SDK
-**Frontend:** React with Tailwind CSS
-**Wallet Integration:** Freighter (Stellar's web extension wallet)
-**Blockchain:** Stellar Network (Testnet)
+- **Decentralized milestone approval**
+- **Weighted voting based on contributions**
+- **Secure fund release logic**
+- **Refunds if funding goals are not met**
+- **Testnet-ready deployment**
+- **React frontend + Freighter wallet integration (mocked)**
 
 ---
 
-### **Project Structure**
+## 🧱 Tech Stack
+
+| Component | Technology |
+|----------|------------|
+| Smart Contract | Rust + Soroban SDK |
+| Frontend | React + Vite + Tailwind CSS |
+| Wallet | Freighter |
+| Blockchain | Stellar Testnet |
+
+---
+
+## 📁 Project Structure
 
 ```
 .
 ├── contract/         # Soroban (Rust) smart contract
 │   ├── Cargo.toml
 │   └── src/
-│       └── lib.rs    # The main contract logic
-└── frontend/         # React frontend application
+│       └── lib.rs    # Main contract logic
+└── frontend/         # React application
     ├── src/
     │   └── App.jsx   # Main React component
     ├── package.json
-    
 ```
 
 ---
 
-### **Smart Contract (contract/)**
+# 🧩 Smart Contract Overview (contract/)
 
-The **lib.rs** file contains the complete on-chain logic for the crowdfunding platform.
+The `lib.rs` file implements all crowdfunding logic.
 
-#### **Key Functions**
+### **Core Contract Functions**
 
-* **initialize(creator, token, goal, deadline, milestones):**
-  Deploys and configures a new project contract. Can only be called once.
+### `initialize(creator, token, goal, deadline, milestones)`
+Configures a project. Can only be called once.
 
-* **fund(backer, amount):**
-  Allows a user to send funds to the contract. Records their contribution.
+### `fund(backer, amount)`
+Registers a contribution from a backer.
 
-* **vote(backer, milestone_index):**
-  Allows a user who has contributed funds to vote "Yes" on a specific milestone.
+### `vote(backer, milestone_index)`
+Allows contributors to vote YES on a milestone.
 
-* **release_funds(milestone_index):**
-  Can be called by anyone. If a milestone has received >50% of votes (weighted by contribution amount), this function transfers the milestone's associated funds to the creator.
+### `release_funds(milestone_index)`
+Transfers milestone-locked funds to the creator when >50% weighted approval is met.
 
-* **claim_refund(backer):**
-  If the funding deadline passes and the goal is not met, this allows backers to retrieve their deposited funds.
-
----
-
-### **How to Build & Deploy (Soroban CLI)**
-
-**Install Soroban CLI:**
-Follow the official installation guide.
+### `claim_refund(backer)`
+If the deadline passes and the goal is unmet, contributors can claim refunds.
 
 ---
 
-#### **Build the Contract:**
+# 🛠️ Build & Deploy (Soroban CLI)
 
-```
+### **1. Build Contract**
+
+```sh
 cd contract
 soroban contract build
 ```
 
-This will produce a `.wasm` file in the `target/` directory.
+Outputs a `.wasm` file under `target/wasm32-unknown-unknown/release/`.
 
 ---
 
-#### **Deploy to Testnet:**
+### **2. Deploy to Testnet**
 
-```
-# This is an example; you will need a funded Testnet account
-soroban contract deploy \
-  --wasm target/wasm32-unknown-unknown/release/milestone_fund.wasm \
-  --source YOUR_TESTNET_ACCOUNT \
-  --network testnet
+```sh
+soroban contract deploy   --wasm target/wasm32-unknown-unknown/release/milestone_fund.wasm   --source YOUR_TESTNET_ACCOUNT   --network testnet
 ```
 
-This will return a **Contract ID** (e.g., `CA...`).
+Produces a **Contract ID**.
 
 ---
 
-#### **Initialize the Deployed Contract:**
+### **3. Initialize the Contract**
 
-```
-# You must call `initialize` on your new contract
-soroban contract invoke \
-  --id YOUR_CONTRACT_ID \
-  --source YOUR_TESTNET_ACCOUNT \
-  --network testnet \
-  -- \
-  initialize \
-  --creator YOUR_TESTNET_ACCOUNT_ADDRESS \
-  --token YOUR_TOKEN_CONTRACT_ID \
-  --goal 10000 \
-  --deadline 1234567 \
-  --milestones '[{"title": "Milestone 1", "amount": 5000}, {"title": "Milestone 2", "amount": 5000}]'
+```sh
+soroban contract invoke   --id YOUR_CONTRACT_ID   --source YOUR_TESTNET_ACCOUNT   --network testnet   --   initialize   --creator YOUR_TESTNET_ACCOUNT_ADDRESS   --token YOUR_TOKEN_CONTRACT_ID   --goal 10000   --deadline 1234567   --milestones '[{"title": "Milestone 1", "amount": 5000}, {"title": "Milestone 2", "amount": 5000}]'
 ```
 
 ---
 
-### **Frontend (frontend/)**
+# 🌐 Frontend (frontend/)
 
-The React app provides a web interface for interacting with the deployed smart contract.
+The React interface allows users to:
 
-**Note:** The included `App.jsx` is a mock-up and does not have the Soroban SDK (`@stellar/soroban-client`) fully integrated. It simulates the logic and wallet interactions.
+- Connect wallet (mocked for now)
+- Fund the project
+- Vote on milestones
+- View project status
+- Trigger fund release or refunds
+
+To make the app fully functional:
+
+```
+npm install @stellar/soroban-client freighter-api
+```
+
+Then replace mocked logic inside `App.jsx` with real contract calls.
 
 ---
 
-### **How to Run**
+# ▶️ Run the Frontend
 
-**Install Dependencies:**
-
-```
+```sh
 cd frontend
 npm install
-```
-
-**Run the Development Server:**
-
-```
 npm run dev
 ```
 
-This will open the app in your browser at **[http://localhost:5173](http://localhost:5173)**.
+Opens: **http://localhost:5173**
 
 ---
 
-### **Connecting to the Real Contract**
+# 🧭 Testnet Deployment (Live)
 
-To make this a fully functional dApp, you would:
+| Item | Value |
+|------|--------|
+| **Contract Address** | `CD6LVDOFXWIH7QQ4ZGVUEJVNXBMFDOPNJANNUEQLPVWK3WPNM44TWYEC` |
+| **Network** | Stellar Testnet |
+| **WASM Hash** | `937135328dee402bbc48a6cc1603e416a36f9a8fef48de2a48db194206fabc99` |
 
-* Install the Soroban client:
-  `npm install @stellar/soroban-client`
-* In `App.jsx`, replace the "simulation" alerts with real contract calls using the soroban-client library.
-* Use the **freighter-api** to request transaction signatures from the user's wallet for functions like `fund`, `vote`, and `claim_refund`.
+### 🔗 Explorer Links
+
+- **Contract:**  
+  https://stellar.expert/explorer/testnet/contract/CD6LVDOFXWIH7QQ4ZGVUEJVNXBMFDOPNJANNUEQLPVWK3WPNM44TWYEC
+
+- **Deploy Transaction:**  
+  https://stellar.expert/explorer/testnet/tx/dc1d77e273455e84bb3b9b498afc65abc75d631345c067d791151c4aac38a4aa
+
+---
+
+## Author
+Rohan Poddar – Initial Work
 
 ---
 
 
+# 🤝 Contributing
+
+Pull requests are welcome!
+
+---
+
+# DISCLAIMER
+- This is a demonstration project deployed on testnet. Do not use real funds or deploy to mainnet without proper security audits and testing.
