@@ -2,7 +2,7 @@
 ---
 
 
-**MilestoneFund - Decentralized Crowdfunding on Soroban**
+***MilestoneFund - Decentralized Crowdfunding on Soroban**
 
 MilestoneFund is a smart contract and web application proof-of-concept that demonstrates decentralized, milestone-based crowdfunding on the Stellar network using the Soroban smart contract platform.
 
