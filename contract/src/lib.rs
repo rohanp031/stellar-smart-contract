@@ -1,7 +1,6 @@
 #![no_std]
 use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, vec, Address, Env, Map, String, Symbol, Vec,
-    Val,
+    contract, contractimpl, contracttype, symbol_short, vec, Address, Env, Map, String, Vec,
 };
 
 // Define a custom error type for the contract
@@ -26,6 +25,23 @@ pub enum Error {
     AlreadyVoted = 16,
     RefundsNotAvailable = 17,
     NoRefundsToClaim = 18,
+    SdkInternalError = 19, // <-- ADD THIS
+}
+
+// This is the implementation you already have (GOOD)
+// This converts YourError -> SdkError
+impl From<&Error> for soroban_sdk::Error {
+    fn from(value: &Error) -> soroban_sdk::Error {
+        soroban_sdk::Error::from_contract_error(*value as u32)
+    }
+}
+
+// FIX: Add the missing implementation (THIS IS NEW)
+// This converts SdkError -> YourError
+impl From<soroban_sdk::Error> for Error {
+    fn from(_value: soroban_sdk::Error) -> Error {
+        Error::SdkInternalError
+    }
 }
 
 // --- Data Structures ---
@@ -45,10 +61,10 @@ pub struct Milestone {
 #[derive(Clone, Debug, PartialEq)]
 pub struct Project {
     pub creator: Address,
-    pub token: Address,      // The asset being raised (e.g., USDC)
-    pub goal: u128,          // The total amount to raise
-    pub raised: u128,        // The current amount raised
-    pub deadline: u64,       // Ledger sequence deadline
+    pub token: Address,       // The asset being raised (e.g., USDC)
+    pub goal: u128,           // The total amount to raise
+    pub raised: u128,         // The current amount raised
+    pub deadline: u64,        // Ledger sequence deadline
     pub milestones: Vec<Milestone>,
     pub backers: Map<Address, u128>, // Map<BackerAddress, AmountFunded>
     pub goal_met: bool,
@@ -88,7 +104,8 @@ impl MilestoneFund {
         }
 
         // --- Input Validations ---
-        if deadline <= env.ledger().sequence() {
+        // FIX: Use u64::from() for explicit type conversion
+        if deadline <= u64::from(env.ledger().sequence()) {
             return Err(Error::DeadlineMustBeInFuture);
         }
         if goal == 0 {
@@ -147,7 +164,8 @@ impl MilestoneFund {
         if project.goal_met {
             return Err(Error::GoalAlreadyMet);
         }
-        if env.ledger().sequence() > project.deadline {
+        // FIX: Use u64::from() for explicit type conversion
+        if u64::from(env.ledger().sequence()) > project.deadline {
             return Err(Error::DeadlinePassed);
         }
 
@@ -275,7 +293,8 @@ impl MilestoneFund {
         let project = Self::get_project(&env)?;
 
         // Refunds only available if deadline passed AND goal was NOT met
-        if env.ledger().sequence() <= project.deadline || project.goal_met {
+        // FIX: Use u64::from() for explicit type conversion
+        if u64::from(env.ledger().sequence()) <= project.deadline || project.goal_met {
             return Err(Error::RefundsNotAvailable);
         }
 
