@@ -1,8 +1,6 @@
-Here you go — exactly as you wrote it:
 
 ---
 
-This immersive artifact is rendered using Gemini AST.
 
 **MilestoneFund - Decentralized Crowdfunding on Soroban**
 
