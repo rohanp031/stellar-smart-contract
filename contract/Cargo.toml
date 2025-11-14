@@ -11,7 +11,7 @@ doctest = false
 [dependencies]
 # This version should be kept in sync with the Soroban environment you are targeting.
 # Check the official Soroban docs for the latest version.
-soroban-sdk = "21.0.1"
+soroban-sdk = "21.7.7"
 
 [profile.release]
 opt-level = "z"
